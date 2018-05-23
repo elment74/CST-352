@@ -1,5 +1,5 @@
 ﻿// Program.cs
-// Pete Myers
+// Tung Duong
 // Spring 2018
 
 // NOTE: Implement the methods in this file
@@ -18,9 +18,11 @@ namespace MiniFS
         {
             try
             {
+			/*
                 TestDisks();
                 TestPhysicalFileSystem();
                 TestVirtualFileSystem();
+			*/
                 TestLogicalFileSystem();
             }
             catch (Exception ex)
@@ -74,16 +76,41 @@ namespace MiniFS
             VolatileDisk disk = new VolatileDisk(1);
             disk.TurnOn();
 
-            // TODO: FREE_SECTOR
+            FREE_SECTOR free1 = new FREE_SECTOR(disk.BytesPerSector);
+            disk.WriteSector(0, free1.RawBytes);
+            FREE_SECTOR free2 = FREE_SECTOR.CreateFromBytes(disk.ReadSector(0));
+            CheckBytes("free1", free1, "free2", free2);
+            Console.WriteLine("FREE_SECTOR: CONFIRMED");
 
-            // TODO: DRIVE_INFO
+            int rootNodeAt = 1;
+            DRIVE_INFO drive1 = new DRIVE_INFO(disk.BytesPerSector, rootNodeAt);
+            disk.WriteSector(0, drive1.RawBytes);
+            DRIVE_INFO drive2 = DRIVE_INFO.CreateFromBytes(disk.ReadSector(0));
+            CheckBytes("drive1", drive1, "drive2", drive2);
+            Console.WriteLine("DRIVE_INFO: CONFIRMED");
 
-            // TODO: DIR_NODE
 
-            // TODO: FILE_NODE
+            DIR_NODE rootDir1 = new DIR_NODE(disk.BytesPerSector, 2, FSConstants.PATH_SEPARATOR.ToString(), 42);
+            disk.WriteSector(rootNodeAt, rootDir1.RawBytes);
+            DIR_NODE rootDir2 = DIR_NODE.CreateFromBytes(disk.ReadSector(rootNodeAt));
+            CheckBytes("rootDir1", rootDir1, "rootDir2", rootDir2);
+            Console.WriteLine("DIR_NODE: CONFIRMED");
 
-            // TODO: DATA_SECTOR
-            
+
+            FILE_NODE file1 = new FILE_NODE(disk.BytesPerSector, 8, "file1", 1000);
+            disk.WriteSector(5, file1.RawBytes);
+            FILE_NODE file2 = FILE_NODE.CreateFromBytes(disk.ReadSector(5));
+            CheckBytes("file1", file1, "file2", file2);
+            Console.WriteLine("FILE_NODE: CONFIRMED");
+
+
+            byte[] filedata = CreateTestBytes(new Random(), DATA_SECTOR.MaxDataLength(disk.BytesPerSector));
+            DATA_SECTOR data1 = new DATA_SECTOR(disk.BytesPerSector, 9, filedata);
+            disk.WriteSector(8, data1.RawBytes);
+            DATA_SECTOR data2 = DATA_SECTOR.CreateFromBytes(disk.ReadSector(8));
+            CheckBytes("data1", data1, "data2", data2);
+            Console.WriteLine("DATA_SECTOR: CONFIRMED");
+
             disk.TurnOff();
         }
 
@@ -109,18 +136,73 @@ namespace MiniFS
 
                 VirtualNode dir1 = root.CreateDirectoryNode("dir1");
                 VirtualNode dir2 = root.CreateDirectoryNode("dir2");
-
+                dir2.CreateDirectoryNode("dir3");
+                dir1.CreateDirectoryNode("dir4");
+                dir2.CreateDirectoryNode("dir5");
+                
                 VirtualNode file1 = dir1.CreateFileNode("file1");
+                VirtualNode file2 = dir1.CreateFileNode("file2");
+                VirtualNode file3 = dir2.CreateFileNode("file3");
+                VirtualNode file4 = dir2.CreateFileNode("file4");
+                
                 TestFileWriteRead(file1, r, 0, 100);    // 1 sector
+                TestFileWriteRead(file1, r, 42, 77);    // 1 sector
                 TestFileWriteRead(file1, r, 0, 500);    // 2 sectors
                 TestFileWriteRead(file1, r, 250, 500);    // 3 sectors
+                TestFileWriteRead(file1, r, 275, 700);    // 3 sectors
 
+                
                 vfs.Unmount("/");
 
                 vfs.Mount(disk, "/");
+                
                 RecursivelyPrintNodes(vfs.RootNode);
+                Console.WriteLine("\n");
 
+
+				Console.WriteLine("Rename");
+				dir1 = vfs.RootNode.GetChild("dir1");
+				dir1.Rename("newdir1");
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				Console.WriteLine("Move");
+				dir2 = vfs.RootNode.GetChild("dir2");
+				dir1.Move(dir2);
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				
+				Console.WriteLine("Mount/Unmount");
+				vfs.Unmount("/");
+				vfs.Mount(disk, "/");
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				
+				Console.WriteLine("Create file");
+				VirtualNode file6 = vfs.RootNode.CreateFileNode("file6");
+				file6.Write(0, CreateTestBytes(r, 1000));
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				
+				Console.WriteLine("Delete file");
+				file6.Delete();
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				
+				VirtualNode deleteDir2 = vfs.RootNode.GetChild("dir2");
+				VirtualNode deleteNewDir1 = deleteDir2.GetChild("newdir1");
+				Console.WriteLine("Delete directory");
+				deleteNewDir1.Delete();
+				RecursivelyPrintNodes(vfs.RootNode);
+				Console.WriteLine("\n");
+				
+				
                 disk.TurnOff();
+				Console.WriteLine("Confirmed");
             }
             catch (Exception ex)
             {
@@ -161,8 +243,10 @@ namespace MiniFS
 
         static void TestLogicalFileSystem()
         {
-            //DiskDriver disk = new VolatileDisk(1);
-            DiskDriver disk = new PersistentDisk(1, "disk1");
+			try
+			{
+            DiskDriver disk = new VolatileDisk(1);
+            //DiskDriver disk = new PersistentDisk(1, "disk1");
             disk.TurnOn();
 
             FileSystem fs = new SimpleFS();
@@ -181,6 +265,7 @@ namespace MiniFS
             stream1.Write(0, bytes1);
             stream1.Close();
 
+			
             File file2_2 = (File)fs.Find("/dir2/file2");
             FileStream stream2 = file2_2.Open();
             byte[] bytes2 = stream2.Read(0, 1000);
@@ -220,8 +305,16 @@ namespace MiniFS
             RecursivelyPrintDirectories(root);
             Console.WriteLine();
 
-            fs.Unmount("/");
-            disk.TurnOff();
+                fs.Unmount("/");
+                disk.TurnOff();
+
+                Console.WriteLine("TestLogicalFileSystem: Confirmed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("LFS failed: " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
         }
 
         static void RecursivelyPrintDirectories(Directory dir, bool printFileContent = false, string indent = "")
