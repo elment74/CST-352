@@ -47,60 +47,64 @@ namespace SimpleFileSystem
 
         public Directory GetRootDirectory()
         {
-            // SimpleFS.GetRootDirectory()
             return new SimpleDirectory(virtualFileSystem.RootNode);
         }
 
         public FSEntry Find(string path)
         {
-			if(path.Length <= 0 || path[0] != PATH_SEPARATOR)
-			{
-				Console.WriteLine("Invalid path: SimpleFS.Find()");
-				return null;
-			}
-			
-			if(path.Length == 1)
-			{
-				return new SimpleDirectory(virtualFileSystem.RootNode);
-			}
-			try
-			{
-				string[] element = path.Split(PATH_SEPARATOR);
-				VirtualNode currentNode = virtualFileSystem.RootNode;
-				for(int i = 1; i < element.Length; i++
-				{
-					if(currentNode.IsFile)
-					{
-						Console.WriteLine("File, Not directory: " + element[i] + " : SimpleFS.Find()");
-						return null;
-					}
-					else
-					{
-						if(element[i].Length != 0
-						{
-							currentNode = currentNode.GetChild(element[i]);
-							if(currentNode == null)
-							{
-								Console.WriteLine("Can't find child: " + elment[i] + ": SimpleFS.Find()")
-								return null;
-							}
-						}
-						else
-						{
-							if(i < element.Length - 1)
-							{
-								Console.WriteLine("Empty path element");
-								return null;
-							}
-						}
-					}
-				}
-				return currentNode. IsDirectory ? (FSEntry)new SimpleDirectory(currentNode):new SimpleFile(currentNode);
-			}
-			catch(Exception ex)
-			{
-				Console.WriteLine("Exception in SimpleFS.Find(): " + ex.Message);
-			}
+            // good:  /foo/bar, /foo/bar/
+            // bad:  foo, foo/bar, //foo/bar, /foo//bar, /foo/../foo/bar
+            if (path.Length <= 0 || path[0] != PATH_SEPARATOR) 
+            {
+                Console.WriteLine("Invalid path in SimpleFS.Find()");
+                return null;
+            }
+
+            if(path.Length == 1)
+            {
+                return new SimpleDirectory(virtualFileSystem.RootNode);
+            }
+
+            try
+            {
+                string[] elements = path.Split(PATH_SEPARATOR);
+                VirtualNode currentNode = virtualFileSystem.RootNode;
+                
+                for(int i = 1; i < elements.Length; i++)
+                {
+                    if (currentNode.IsFile)
+                    {
+                        Console.WriteLine("Hey that's a file, not a directory. " + elements[i] + " in SimpleFS.Find()");
+                        return null;
+                    }
+                    else
+                    {
+                        if (elements[i].Length != 0)
+                        {
+                            currentNode = currentNode.GetChild(elements[i]);
+                            if (currentNode == null)
+                            {
+                                Console.WriteLine("Can't find child " + elements[i] + " in SimpleFS.Find()");
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            if (i < elements.Length - 1) 
+                            {
+                                Console.WriteLine("Empty path element in SimpleFS.Find()");
+                                return null;
+                            }
+                        }
+                    }
+                }
+
+                return currentNode.IsDirectory ? (FSEntry)new SimpleDirectory(currentNode): new SimpleFile(currentNode);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Caught Exception in SimpleFS.Find(): " + ex.Message);
+            }
             return null;
         }
 
@@ -178,7 +182,8 @@ namespace SimpleFileSystem
 
             public IEnumerable<Directory> GetSubDirectories()
             {
-				List<Directory> subdirs = new List<Directory>();
+                //get all directory children and return a set of them as SimpleDirectorys
+                List<Directory> subdirs = new List<Directory>();
                 foreach(VirtualNode child in node.GetChildren())
                 {
                     if(child.IsDirectory)
@@ -186,12 +191,14 @@ namespace SimpleFileSystem
                         subdirs.Add(new SimpleDirectory(child));
                     }
                 }
+
                 return subdirs;
             }
 
             public IEnumerable<File> GetFiles()
             {
-			List<File> files = new List<File>();
+                //get all file children and return a set of them as SimpleFiles
+                List<File> files = new List<File>();
                 foreach (VirtualNode child in node.GetChildren())
                 {
                     if (child.IsFile)
@@ -199,13 +206,13 @@ namespace SimpleFileSystem
                         files.Add(new SimpleFile(child));
                     }
                 }
+
                 return files;
             }
 
             public Directory CreateDirectory(string name)
             {
-                // SimpleDirectory.CreateDirectory()
-				return new SimpleDirectory(node.CreateDirectoryNode(name));
+                return new SimpleDirectory(node.CreateDirectoryNode(name));
             }
 
             public File CreateFile(string name)
@@ -248,7 +255,7 @@ namespace SimpleFileSystem
 
             public void Close()
             {
-                // TODO: SimpleStream.Close() aka not needed
+                // in this implementation, nothing to do here.
             }
 
             public byte[] Read(int index, int length)

@@ -1,0 +1,9 @@
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\bin\Debug\MiniFS.exe.config
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\bin\Debug\MiniFS.exe
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\bin\Debug\MiniFS.pdb
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\bin\Debug\SimpleFileSystem.dll
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\bin\Debug\SimpleFileSystem.pdb
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\obj\Debug\MiniFS.csprojResolveAssemblyReference.cache
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\obj\Debug\MiniFS.csproj.CoreCompileInputs.cache
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\obj\Debug\MiniFS.exe
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\MiniFS\obj\Debug\MiniFS.pdb

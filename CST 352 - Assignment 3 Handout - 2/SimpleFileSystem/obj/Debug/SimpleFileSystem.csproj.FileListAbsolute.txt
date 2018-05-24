@@ -1,0 +1,6 @@
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\bin\Debug\SimpleFileSystem.dll
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\bin\Debug\SimpleFileSystem.pdb
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\obj\Debug\SimpleFileSystem.csproj.CoreCompileInputs.cache
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\obj\Debug\SimpleFileSystem.dll
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\obj\Debug\SimpleFileSystem.pdb
+C:\Users\keyul\Downloads\Operating Systems\Assignments\CST 352 - Assignment 3 Handout\SimpleFileSystem\obj\Debug\SimpleFileSystem.csprojResolveAssemblyReference.cache

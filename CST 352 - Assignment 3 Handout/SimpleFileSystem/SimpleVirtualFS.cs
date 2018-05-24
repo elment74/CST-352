@@ -31,7 +31,7 @@ namespace SimpleFileSystem
         {
             // wipe all sectors of disk and create minimum required DRIVE_INFO, DIR_NODE and DATA_SECTOR
 
-			FREE_SECTOR free = new FREE_SECTOR(dis.BytesPerSector);
+			FREE_SECTOR free = new FREE_SECTOR(disk.BytesPerSector);
 			for(int i = 0; i < disk.SectorCount; i++)
 			{
 				disk.WriteSector(i, free.RawBytes);
